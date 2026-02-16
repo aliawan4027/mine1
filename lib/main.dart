@@ -5,6 +5,7 @@ import 'package:confetti/confetti.dart';
 import 'dart:math';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const LoveGameApp());
@@ -113,77 +114,112 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  // Direct SMTP email function using Gmail
+  // Simple email function that saves data locally
   Future<void> _sendEmail() async {
     try {
-      // Using a simple email service that works with Flutter Web
-      // For production, you should use a backend service
+      // Save to local storage first
+      await _saveClickCount();
 
-      final response = await http.post(
-        Uri.parse(
-          'https://formspree.io/f/your_form_id',
-        ), // Alternative: Use Formspree
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: json.encode({
-          'email': 'clashwithme1122@gmail.com',
-          'subject': 'Dinner Response! 🍽️',
-          'message':
-              'She said YES to dinner!\n\nNumber of times No was clicked before Yes: $_noClickCount\n\nTime to eat! 🎉',
-          'to_email': 'aliawan1170@gmail.com',
-        }),
-      );
+      // Try to send notification
+      await _sendSimpleNotification();
 
-      if (response.statusCode == 200) {
-        print('Email notification sent successfully!');
-        // Also try to send directly to your Gmail using a simple email service
-        _sendDirectEmail();
-      } else {
-        print('Formspree failed, trying direct email...');
-        _sendDirectEmail();
-      }
+      // Show success message to user
+      _showNotificationMessage();
     } catch (e) {
-      print('Error sending email: $e');
-      _sendDirectEmail();
+      print('Notification failed: $e');
+      _saveClickCount(); // Always save locally
+      _showNotificationMessage();
     }
   }
 
-  // Backup email method using a simple email API
-  Future<void> _sendDirectEmail() async {
-    try {
-      // Using EmailJS backup with your provided credentials
-      const String serviceId = 'service_default';
-      const String templateId = 'template_default';
-      const String userId = 'user_default';
+  // Save click count to local storage
+  Future<void> _saveClickCount() async {
+    final prefs = await SharedPreferences.getInstance();
+    final timestamp = DateTime.now().toString();
 
+    // Save the game result
+    await prefs.setString(
+      'last_game_result',
+      {
+        'clicks': _noClickCount.toString(),
+        'timestamp': timestamp,
+        'result': 'YES',
+      }.toString(),
+    );
+
+    // Save to history
+    final history = prefs.getStringList('game_history') ?? [];
+    history.add('Game at $timestamp: $_noClickCount clicks before YES');
+    await prefs.setStringList('game_history', history);
+
+    print('Game result saved locally!');
+  }
+
+  // Show notification message to user
+  void _showNotificationMessage() {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('🎉 Game saved! $_noClickCount clicks before YES'),
+          duration: const Duration(seconds: 5),
+          action: SnackBarAction(
+            label: 'View Data',
+            onPressed: () => _showSavedData(),
+          ),
+        ),
+      );
+    }
+  }
+
+  // Show saved game data
+  void _showSavedData() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('📊 Game Results'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Last game: $_noClickCount clicks before YES'),
+            const SizedBox(height: 10),
+            const Text('Send this info to aliawan1170@gmail.com'),
+            const Text('Or call: 03467648259'),
+            const SizedBox(height: 10),
+            Text('Message: "She said YES after $_noClickCount No clicks"'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Try simple notification service
+  Future<void> _sendSimpleNotification() async {
+    try {
+      // Using a free notification service
       final response = await http.post(
-        Uri.parse('https://api.emailjs.com/api/v1.0/email/send'),
+        Uri.parse('https://api.pushover.net/1/messages.json'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
-          'service_id': serviceId,
-          'template_id': templateId,
-          'user_id': userId,
-          'template_params': {
-            'to_email': 'aliawan1170@gmail.com',
-            'from_email': 'clashwithme1122@gmail.com',
-            'subject': 'Dinner Response! 🍽️',
-            'message':
-                'She said YES to dinner!\n\nNumber of times No was clicked before Yes: $_noClickCount\n\nTime to eat! 🎉',
-          },
+          'token': 'your_pushover_token', // Get from pushover.net
+          'user': 'your_pushover_user_key',
+          'message':
+              'She said YES to dinner after $_noClickCount No clicks! 🎉',
+          'title': 'Dinner Game Result',
         }),
       );
 
       if (response.statusCode == 200) {
-        print('Direct email sent successfully!');
-      } else {
-        print('Email services failed, but game continues!');
-        print('Error: ${response.body}');
+        print('Push notification sent!');
       }
     } catch (e) {
-      print('All email methods failed: $e');
-      print('Game continues without email notification');
+      print('Push notification failed: $e');
     }
   }
 

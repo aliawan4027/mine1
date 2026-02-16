@@ -40,6 +40,9 @@ dependencies:
   
   # Confetti animation
   confetti: ^0.7.0
+  
+  # Local storage
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:
