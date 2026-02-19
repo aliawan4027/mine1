@@ -207,8 +207,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         Uri.parse('https://api.pushover.net/1/messages.json'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
-          'token': 'your_pushover_token', // Get from pushover.net
-          'user': 'your_pushover_user_key',
+          'token': 'a19u9ivqjk64npgywbejickzgij7so',
+          'user': 'uda9ms5pt7fsruyouimqk2webks4q8',
           'message':
               'She said YES to dinner after $_noClickCount No clicks! 🎉',
           'title': 'Dinner Game Result',
@@ -352,7 +352,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         const Text(
           'Please play till the end…',
           style: TextStyle(
-            fontSize: 32,
+            fontSize: 28,
             fontWeight: FontWeight.bold,
             color: Colors.white,
             shadows: [
@@ -371,15 +371,21 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.white,
             foregroundColor: Colors.pink,
-            padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+            padding: EdgeInsets.symmetric(
+              horizontal: MediaQuery.of(context).size.width < 400 ? 30 : 50,
+              vertical: MediaQuery.of(context).size.height < 700 ? 15 : 20,
+            ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30),
             ),
             elevation: 10,
           ),
-          child: const Text(
+          child: Text(
             'Start',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: MediaQuery.of(context).size.width < 400 ? 20 : 24,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ],
@@ -391,7 +397,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       children: [
         // Question
         Positioned(
-          top: 100,
+          top: MediaQuery.of(context).size.height < 800 ? 50 : 100,
           left: 20,
           right: 20,
           child: Container(
@@ -407,10 +413,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                 ),
               ],
             ),
-            child: const Text(
-              'Would you like to grab dinner sometime next week?',
+            child: Text(
+              'aftri pr chalna ha next week agr available ho?',
               style: TextStyle(
-                fontSize: 28,
+                fontSize: MediaQuery.of(context).size.width < 600 ? 22 : 28,
                 fontWeight: FontWeight.bold,
                 color: Colors.pink,
               ),
@@ -422,8 +428,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         // Yes Button
         if (!_isNoButtonMoving)
           Positioned(
-            bottom: 200,
-            left: 50,
+            bottom: MediaQuery.of(context).size.height < 700 ? 150 : 200,
+            left: MediaQuery.of(context).size.width < 400 ? 20 : 50,
             child: AnimatedBuilder(
               animation: _bounceController,
               builder: (context, child) {
@@ -434,19 +440,25 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                        vertical: 20,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.of(context).size.width < 400
+                            ? 20
+                            : 40,
+                        vertical: MediaQuery.of(context).size.height < 700
+                            ? 15
+                            : 20,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       ),
                       elevation: 15,
                     ),
-                    child: const Text(
+                    child: Text(
                       'Yes',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: MediaQuery.of(context).size.width < 400
+                            ? 16
+                            : 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -459,7 +471,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         // Yes Button (centered when No button is moving)
         if (_isNoButtonMoving)
           Positioned(
-            bottom: 200,
+            bottom: MediaQuery.of(context).size.height < 700 ? 150 : 200,
             left: 0,
             right: 0,
             child: Center(
@@ -474,19 +486,25 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 60,
-                          vertical: 30,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width < 400
+                              ? 40
+                              : 60,
+                          vertical: MediaQuery.of(context).size.height < 700
+                              ? 20
+                              : 30,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
                         elevation: 20,
                       ),
-                      child: const Text(
+                      child: Text(
                         'Yes',
                         style: TextStyle(
-                          fontSize: 28,
+                          fontSize: MediaQuery.of(context).size.width < 400
+                              ? 18
+                              : 22,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -500,8 +518,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         // No Button
         if (!_isNoButtonMoving)
           Positioned(
-            bottom: 200,
-            right: 50,
+            bottom: MediaQuery.of(context).size.height < 700 ? 150 : 200,
+            right: MediaQuery.of(context).size.width < 400 ? 20 : 50,
             child: AnimatedBuilder(
               animation: _shakeController,
               builder: (context, child) {
@@ -532,8 +550,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                         _getCurrentNoMessage(),
                         style: TextStyle(
                           fontSize: math.max(
-                            16,
-                            (20 - _noClickCount) as double,
+                            MediaQuery.of(context).size.width < 400 ? 12 : 16,
+                            (MediaQuery.of(context).size.width < 400
+                                    ? 16
+                                    : 20 - _noClickCount)
+                                as double,
                           ),
                           fontWeight: FontWeight.bold,
                         ),
@@ -564,9 +585,11 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width < 400
+                        ? 10
+                        : 20,
+                    vertical: MediaQuery.of(context).size.height < 700 ? 8 : 10,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
@@ -575,8 +598,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                 ),
                 child: Text(
                   _getCurrentNoMessage(),
-                  style: const TextStyle(
-                    fontSize: 12,
+                  style: TextStyle(
+                    fontSize: MediaQuery.of(context).size.width < 400 ? 10 : 12,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -630,10 +653,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
           ),
         ),
         const SizedBox(height: 20),
-        const Text(
+        Text(
           'She said YES to dinner! 🎉',
           style: TextStyle(
-            fontSize: 28,
+            fontSize: MediaQuery.of(context).size.width < 400 ? 22 : 28,
             fontWeight: FontWeight.bold,
             color: Colors.green,
           ),
@@ -641,7 +664,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         const SizedBox(height: 20),
         Text(
           'You clicked No $_noClickCount times before saying Yes to dinner!',
-          style: const TextStyle(fontSize: 18, color: Colors.green),
+          style: TextStyle(
+            fontSize: MediaQuery.of(context).size.width < 400 ? 16 : 18,
+            color: Colors.green,
+          ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 40),
@@ -661,15 +687,21 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.yellow,
             foregroundColor: Colors.green,
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+            padding: EdgeInsets.symmetric(
+              horizontal: MediaQuery.of(context).size.width < 400 ? 20 : 30,
+              vertical: MediaQuery.of(context).size.height < 700 ? 12 : 15,
+            ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(25),
             ),
             elevation: 10,
           ),
-          child: const Text(
+          child: Text(
             'Play Again',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: MediaQuery.of(context).size.width < 400 ? 16 : 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ],
